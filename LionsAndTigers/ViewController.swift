@@ -14,9 +14,12 @@ class ViewController: UIViewController {
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var ageLabel: UILabel!
     @IBOutlet weak var breedLabel: UILabel!
+    @IBOutlet weak var randomFactLabel: UILabel!
     
     // property, allows us to access Tigers in various functions
     var myTigers:[Tiger] = []
+    
+    var currentIndex = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,14 +31,20 @@ class ViewController: UIViewController {
         myTiger.breed = "Bengal"
         myTiger.age = 3
         myTiger.image = UIImage(named: "BengalTiger.jpg")
-        myTigers.append(myTiger)
+        self.myTigers.append(myTiger)
+        
+        myTiger.age = myTiger.ageInTigerYearsFromAge(myTiger.age)
+        myTiger.chuff()
         
         // println("My tigers name is \(myTiger.name). It's breed is \(myTiger.breed), and it's age is \(myTiger.age).")
         
-        myImageView.image = myTiger.image
-        nameLabel.text = myTiger.name
-        ageLabel.text = "\(myTiger.age)"
-        breedLabel.text = myTiger.breed
+        // self can be used for properties of ViewController class
+        // cannot be used for structs
+        self.myImageView.image = myTiger.image
+        self.nameLabel.text = myTiger.name
+        self.ageLabel.text = "\(myTiger.age)"
+        self.breedLabel.text = myTiger.breed
+        self.randomFactLabel.text = myTiger.randomFact()
         
         // secondTiger
         var secondTiger = Tiger()
@@ -43,6 +52,7 @@ class ViewController: UIViewController {
         secondTiger.breed = "Indo-Chinese Tiger"
         secondTiger.age = 2
         secondTiger.image = UIImage(named: "IndochineseTiger.jpg")
+        secondTiger.age = secondTiger.ageInTigerYearsFromAge(secondTiger.age)
         
         // thirdTiger
         var thirdTiger = Tiger()
@@ -50,6 +60,7 @@ class ViewController: UIViewController {
         thirdTiger.breed = "Malayan Tiger"
         thirdTiger.age = 4
         thirdTiger.image = UIImage(named: "MalayanTiger.jpg")
+        thirdTiger.age = secondTiger.ageInTigerYearsFromAge(thirdTiger.age)
         
         // fourthTiger
         var fourthTiger = Tiger()
@@ -57,12 +68,13 @@ class ViewController: UIViewController {
         fourthTiger.breed = "Siberian Tiger"
         fourthTiger.age = 5
         fourthTiger.image = UIImage(named: "SiberianTiger.jpg")
+        fourthTiger.age = fourthTiger.ageInTigerYearsFromAge(fourthTiger.age)
         
         // set up an array of Tigers
         // var tigerNames:Array<String>     // alternate method
         // var tigerNames:[String]          // alternate method
         // var tigerNames = ["Tigger", "Tigress", "Jacob", "Spar"]
-        myTigers += [secondTiger, thirdTiger, fourthTiger]
+        self.myTigers += [secondTiger, thirdTiger, fourthTiger]
         
         // generate a random number
         // UInt32 = unsigned integer, 32 bit
@@ -78,12 +90,22 @@ class ViewController: UIViewController {
     }
 
     @IBAction func nextBarButtonItemPressed(sender: AnyObject) {
+        // sender is a parameter, can be altered
+        // ex. sender.setAngle(1.0, magnitude: 1.0)
+        
+        var randomIndex:Int
         // generate a random number
         // UInt32 = unsigned integer, 32 bit
         // 5 - generates a random number 0 through 4
-        let randomIndex = Int(arc4random_uniform(UInt32(myTigers.count)))
+        //let randomIndex = Int(arc4random_uniform(UInt32(myTigers.count)))
         
-        let tiger = myTigers[randomIndex]
+        do {
+            randomIndex = Int(arc4random_uniform(UInt32(myTigers.count)))
+        } while randomIndex == self.currentIndex
+        
+        self.currentIndex = randomIndex
+        
+        let tiger = self.myTigers[randomIndex]
         
         // update UI
 //        myImageView.image = tiger.image
@@ -100,6 +122,7 @@ class ViewController: UIViewController {
             }, completion: {
                 (finished: Bool) -> () in
         })
+            self.randomFactLabel.text = tiger.randomFact()
     }
 
 }
