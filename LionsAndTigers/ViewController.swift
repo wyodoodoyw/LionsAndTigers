@@ -18,8 +18,11 @@ class ViewController: UIViewController {
     
     // property, allows us to access Tigers in various functions
     var myTigers:[Tiger] = []
+    var lions:[Lion] = []
     
     var currentIndex = 0
+    
+    var currentAnimal = (species: "Tiger", index: 0)    // a tuple
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -81,7 +84,25 @@ class ViewController: UIViewController {
         // 5 - generates a random number 0 through 4
         let randomNumber = Int(arc4random_uniform(UInt32(5)))
         
+        var lion = Lion()
+        lion.age = 4
+        lion.isAlphaMale = false
+        lion.image = UIImage(named: "Lion.jpg")
+        lion.name = "Mufasa"
+        lion.subspecies = "West African"
         
+        var lioness = Lion()
+        lioness.age = 3
+        lioness.isAlphaMale = false
+        lioness.image = UIImage(named: "Lioness.jpeg")
+        lioness.name = "Sarabi"
+        lioness.subspecies = "Barbary"
+        
+        lion.roar()
+        lion.changeToAlphaMale()    // can change properties within functions in classes, not structs
+        println(lion.isAlphaMale)
+        
+        self.lions += [lion, lioness]
     }
 
     override func didReceiveMemoryWarning() {
@@ -90,39 +111,80 @@ class ViewController: UIViewController {
     }
 
     @IBAction func nextBarButtonItemPressed(sender: AnyObject) {
-        // sender is a parameter, can be altered
-        // ex. sender.setAngle(1.0, magnitude: 1.0)
-        
-        var randomIndex:Int
-        // generate a random number
-        // UInt32 = unsigned integer, 32 bit
-        // 5 - generates a random number 0 through 4
-        //let randomIndex = Int(arc4random_uniform(UInt32(myTigers.count)))
-        
-        do {
-            randomIndex = Int(arc4random_uniform(UInt32(myTigers.count)))
-        } while randomIndex == self.currentIndex
-        
-        self.currentIndex = randomIndex
-        
-        let tiger = self.myTigers[randomIndex]
-        
-        // update UI
+//        // sender is a parameter, can be altered
+//        // ex. sender.setAngle(1.0, magnitude: 1.0)
+//        
+//        var randomIndex:Int
+//        // generate a random number
+//        // UInt32 = unsigned integer, 32 bit
+//        // 5 - generates a random number 0 through 4
+//        //let randomIndex = Int(arc4random_uniform(UInt32(myTigers.count)))
+//        
+//        do {
+//            randomIndex = Int(arc4random_uniform(UInt32(myTigers.count)))
+//        } while randomIndex == self.currentIndex
+//        
+//        self.currentIndex = randomIndex
+//        
+//        let tiger = self.myTigers[randomIndex]
+//        
+//        // update UI
 //        myImageView.image = tiger.image
 //        nameLabel.text = tiger.name
 //        ageLabel.text = "\(tiger.age)"
 //        breedLabel.text = tiger.breed
+//        
+//        UIView.transitionWithView(self.view, duration: 2, options: UIViewAnimationOptions.TransitionFlipFromBottom, animations: {
+//            // must access these with self. syntax
+//            self.myImageView.image = tiger.image
+//            self.nameLabel.text = tiger.name
+//            self.ageLabel.text = "\(tiger.age)"
+//            self.breedLabel.text = tiger.breed
+//            }, completion: {
+//                (finished: Bool) -> () in
+//        })
+//            self.randomFactLabel.text = tiger.randomFact()
+        
+        updateAnimal()
+        updateView()
+    }
+    
+    func updateAnimal () {
+        switch currentAnimal {
+        
+        case ("Tiger", _):
+            let randomIndex = Int(arc4random_uniform(UInt32(self.lions.count)))
+            currentAnimal = ("Lion", randomIndex)
+            
+        default:
+            let randomIndex = Int(arc4random_uniform(UInt32(self.myTigers.count)))
+            currentAnimal = ("Tiger", randomIndex)
+        }
+    }
+    
+    func updateView () {
         
         UIView.transitionWithView(self.view, duration: 2, options: UIViewAnimationOptions.TransitionFlipFromBottom, animations: {
-            // must access these with self. syntax
-            self.myImageView.image = tiger.image
-            self.nameLabel.text = tiger.name
-            self.ageLabel.text = "\(tiger.age)"
-            self.breedLabel.text = tiger.breed
+            if self.currentAnimal.species == "Tiger" {
+                let tiger = self.myTigers[self.currentAnimal.index]
+                self.myImageView.image = tiger.image
+                self.breedLabel.text = tiger.breed
+                self.ageLabel.text = "\(tiger.age)"
+                self.nameLabel.text = tiger.name
+                self.randomFactLabel.text = tiger.randomFact()
+                
+            } else if self.currentAnimal.species == "Lion" {
+                let lion = self.lions[self.currentAnimal.index]
+                self.myImageView.image = lion.image
+                self.breedLabel.text = lion.subspecies
+                self.ageLabel.text = "\(lion.age)"
+                self.nameLabel.text = lion.name
+                self.randomFactLabel.text = lion.randomFact()
+            }
             }, completion: {
                 (finished: Bool) -> () in
         })
-            self.randomFactLabel.text = tiger.randomFact()
+        self.randomFactLabel.hidden = false
     }
 
 }
